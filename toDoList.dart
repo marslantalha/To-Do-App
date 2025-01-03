@@ -1,60 +1,87 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 
-// ignore: camel_case_types
-class toDoList extends StatefulWidget {
-  const toDoList({super.key});
+class ToDoList extends StatefulWidget {
+  const ToDoList({Key? key}) : super(key: key);
 
   @override
-  State<toDoList> createState() => _toDoListState();
+  State<ToDoList> createState() => _ToDoListState();
 }
 
-// ignore: camel_case_types
-class _toDoListState extends State<toDoList> {
+class _ToDoListState extends State<ToDoList> {
   TextEditingController toDoListController = TextEditingController();
   List<String> toDoList = ["Dummy Task"];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.lightBlueAccent,
-          title: TextField(
-            controller: toDoListController,
+      appBar: AppBar(
+        title: TextField(
+          controller: toDoListController,
+          decoration: InputDecoration(
+            hintText: "Enter a task",
           ),
-          actions: [
-            ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    if (toDoListController.text.isNotEmpty) {
-                      toDoList.add(toDoListController.text);
-                      toDoListController.clear();
-                    }
-                  });
-                },
-                child: Text("Add Task"))
-          ],
         ),
-        body: SafeArea(
-            child: ListView.builder(
-                itemCount: toDoList.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(top: 8),
-                    child: ListTile(
-                      tileColor: Colors.grey[200],
-                      title: Text(toDoList[index]),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  toDoList.add(toDoListController.text);
+                  toDoListController.clear();
+                });
+              },
+              child: Text("Add Task"))
+        ],
+      ),
+      body: SafeArea(
+        child: ListView.builder(
+            itemCount: toDoList.length,
+            itemBuilder: (toDoTask, index) {
+              return Container(
+                margin: EdgeInsets.only(bottom: 3),
+                child: ListTile(
+                  tileColor: Colors.grey[200],
+                  title: Text("${index + 1}.  ${toDoList[index]}"),
+                  trailing: Wrap(children: [
+                    IconButton(
                         onPressed: () {
-                          setState(() {
-                            toDoList.removeAt(index);
-                          });
+                          // toDoListController.text = toDoList[index];
+                          showDialog(
+                              context: toDoTask,
+                              builder: (toDoTask) {
+                                return AlertDialog(
+                                  title: Text("Update Task"),
+                                  content: TextField(
+                                    controller: toDoListController,
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            toDoList[index] =
+                                                toDoListController.text;
+                                            toDoListController.clear();
+                                            Navigator.pop(toDoTask);
+                                          });
+                                        },
+                                        child: Text("Update Task")),
+                                  ],
+                                );
+                              });
                         },
-                      ),
+                        icon: Icon(Icons.edit)),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          toDoList.removeAt(index);
+                        });
+                      },
                     ),
-                    // padding: EdgeInsets.only(bottom: 3),
-                  );
-                })));
+                  ]),
+                ),
+              );
+            }),
+      ),
+    );
   }
 }
